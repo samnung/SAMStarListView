@@ -11,10 +11,10 @@
 
 @implementation SAMStarListView
 
-@synthesize count = _count, countOfFull = _countOfFull;
+@synthesize count = _count, countOfFull = _countOfFull, square = _rectangle;
 
 
-- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor andInnerColor:(UIColor *)innerColor
+- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor
 {
 	self = [super initWithFrame:frame];
 	
@@ -28,7 +28,7 @@
 			CGFloat width = self.frame.size.width / _count;
 			CGFloat x = i * width;
 			CGRect rect = CGRectMake(x, 0, width, self.frame.size.height);
-			SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:strokeColor andInnerColor:innerColor];
+			SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:strokeColor];
 			star.full = !(i+1 > _countOfFull);
 			[self addSubview:star];
 		}
@@ -37,19 +37,32 @@
 	return self;
 }
 
-- (void) layoutSubviews
+- (void) setSquare:(BOOL)rectangle
 {
-	NSUInteger i = 0;
+	_rectangle = rectangle;
+	
 	for ( UIView * view in self.subviews )
 	{
 		if ( [view isMemberOfClass:[SAMStarView class]] )
 		{
-			CGFloat width = self.frame.size.width / _count;
-			CGFloat x = i * width;
-			CGRect rect = CGRectMake(x, 0, width, self.frame.size.height);
-			
-			view.frame = rect;
-			
+			SAMStarView *star = (SAMStarView *)view;
+			star.square = _rectangle;
+		}
+	}
+}
+
+- (void) layoutSubviews
+{
+	NSUInteger i = 0;
+	
+	CGFloat width = self.frame.size.width / _count;
+	CGFloat height = self.frame.size.height;
+	
+	for ( UIView * view in self.subviews )
+	{
+		if ( [view isMemberOfClass:[SAMStarView class]] )
+		{
+			view.frame = CGRectMake(i * width, 0.0, width, height);;
 			i++;
 		}
 	}

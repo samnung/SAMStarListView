@@ -9,19 +9,18 @@
 
 @implementation SAMStarView
 
-@synthesize full = _full, color = _color, innerColor = _innerColor;
+@synthesize full = _full, color = _color, square = _square;
 
 
 # pragma mark Init
 
-- (id) initWithFrame:(CGRect)frame color:(UIColor *)color andInnerColor:(UIColor *)innerColor
+- (id) initWithFrame:(CGRect)frame color:(UIColor *)color
 {
     self = [super initWithFrame:frame];
 	
     if (self)
 	{
 		_color = color;
-		_innerColor = innerColor;
 		_full = YES;
 		
 		[self setBackgroundColor:[UIColor clearColor]];
@@ -46,73 +45,101 @@
 	[self setNeedsDisplay];
 }
 
-- (void) setInnerColor:(UIColor *)innerColor
+- (void) setSquare:(BOOL)rectangle
 {
-	_innerColor = innerColor;
+	_square = rectangle;
 	[self setNeedsDisplay];
 }
 
 
 #pragma mark Draw
 
-- (void) drawStarInRect:(CGRect)rect withColor:(UIColor *)color
-{
-	int aSize = 0.0;
-	
-    CGColorRef aColor = color.CGColor;
-	
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetLineWidth(context, aSize);
 
-	
-    CGFloat xCenter = rect.origin.x + rect.size.width / 2;
-    CGFloat yCenter = rect.origin.y + rect.size.height / 2;
-	
-    float  w = MIN(rect.size.width, rect.size.height);
-    double r = w / 2.0;
-    float flip = -1.0;
-	
-	
-	CGContextSetFillColorWithColor(context, aColor);
-	CGContextSetStrokeColorWithColor(context, aColor);
-	
-	double theta = 2.0 * M_PI * (2.0 / 5.0); // 144 degrees
-	
-	CGContextMoveToPoint(context, xCenter, r*flip+yCenter);
-	
-	for ( NSUInteger k = 1; k < 5; k++ )
+void drawStar(CGContextRef context, CGRect rect, NSUInteger corners, UIColor * color,
+			  CGFloat proportion, CGFloat startAngle, BOOL full)
+{
+	if (corners > 2)
 	{
-		float x = r * sin(k * theta);
-		float y = r * cos(k * theta);
-		CGContextAddLineToPoint(context, x+xCenter, y*flip+yCenter);
+		CGFloat 	lineWidth = MIN(rect.size.height, rect.size.width) / 13;
+		
+		CGContextSetLineWidth(context, lineWidth);
+		CGContextSetStrokeColorWithColor(context, color.CGColor);
+		CGContextSetFillColorWithColor(context, color.CGColor);
+		
+		
+		float angle = (M_PI * 2) / (2 * corners);  // twice as many sides
+		float dw; // draw width
+		float dh; // draw height
+		
+		
+		CGFloat width = rect.size.width - 2.5 * lineWidth;
+		CGFloat height = rect.size.height - 2.3 * lineWidth;
+		CGFloat w = width / 2.0;
+		CGFloat h = height / 2.0;
+		
+		CGFloat cx = CGRectGetMidX(rect);
+		CGFloat cy = CGRectGetMidY(rect) + lineWidth / 2;
+		
+		
+		CGContextMoveToPoint(context, cx + w * cos(startAngle), cy + h * sin(startAngle));
+		
+		for (int i = 1; i < 2 * corners; i++)
+		{
+			if (i % 2 == 1)
+			{
+				dw = w * proportion;
+				dh = h * proportion;
+			}
+			else
+			{
+				dw = w;
+				dh = h;
+			}
+
+			CGContextAddLineToPoint(context, cx + dw * cos(startAngle + angle * i),
+											 cy + dh * sin(startAngle + angle * i));
+		}
+		
+		CGContextClosePath(context);
+		
+		CGContextDrawPath(context, full ? kCGPathFillStroke : kCGPathStroke);
 	}
-    
-    CGContextClosePath(context);
-	CGContextFillPath(context);
+}
+
+CGRect starRect(CGRect rect, BOOL square)
+{
+	CGFloat width = rect.size.width;
+	CGFloat height = rect.size.height;
+	CGFloat x = rect.origin.x;
+	CGFloat y = rect.origin.y;
+	
+	if ( square )
+	{
+		if ( height < width )
+		{
+			x += width / 2 - height / 2;
+		}
+		else
+		{
+			y += width / 2 - height / 2;
+		}
+		
+		CGFloat min = MIN(height, width);
+		
+		width = min;
+		height = min;
+	}
+	
+	return CGRectMake(x, y, width, height);
 }
 
 - (void) drawRect:(CGRect)rect
 {
 	[super drawRect:rect];
-
-	// draw star
-	[self drawStarInRect:rect withColor:_color];
 	
-	// draw inner star as empty star
-	if ( ! _full )
-	{
-		CGFloat width = rect.size.width;
-		CGFloat x = width / 4;
-		width -= x * 2;
-		
-		CGFloat height = rect.size.height;
-		CGFloat y = height / 4;
-		
-		height -= y * 2;
-		
-		CGRect rect_ = CGRectMake(x, y, width, height);
-		[self drawStarInRect:rect_ withColor:_innerColor];
-	}
+	// draw star
+	drawStar(UIGraphicsGetCurrentContext(), starRect(rect, _square), 5, _color, 0.38, (-M_PI / 2.0), _full);
+
 }
 
 

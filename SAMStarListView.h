@@ -11,9 +11,10 @@
 
 @property (nonatomic, assign) NSUInteger count;
 @property (nonatomic, assign) NSUInteger countOfFull;
+@property (nonatomic, assign) BOOL square;
 
 
-- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor andInnerColor:(UIColor *)innerColor;
+- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor;
 
 
 @end
