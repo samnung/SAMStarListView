@@ -10,14 +10,11 @@
 
 
 @implementation SAMStarListView
-{
-	
-}
 
 @synthesize count = _count, countOfFull = _countOfFull;
 
 
-- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull
+- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor andInnerColor:(UIColor *)innerColor
 {
 	self = [super initWithFrame:frame];
 	
@@ -31,7 +28,7 @@
 			CGFloat width = self.frame.size.width / _count;
 			CGFloat x = i * width;
 			CGRect rect = CGRectMake(x, 0, width, self.frame.size.height);
-			SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:COLOR_BROWN_LIGHT andInnerColor:COLOR_BACKGROUND];
+			SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:strokeColor andInnerColor:innerColor];
 			star.full = !(i+1 > _countOfFull);
 			[self addSubview:star];
 		}

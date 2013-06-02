@@ -13,7 +13,7 @@
 @property (nonatomic, assign) NSUInteger countOfFull;
 
 
-- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull;
+- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor andInnerColor:(UIColor *)innerColor;
 
 
 @end
