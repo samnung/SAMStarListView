@@ -28,9 +28,9 @@
 		
 		for (NSUInteger i = 0; i < _count; i ++)
 		{
-			CGFloat width = self.frame.size.width / _count;
+			CGFloat width = self.bounds.size.width / _count;
 			CGFloat x = i * width;
-			CGRect rect = CGRectMake(x, 0, width, self.frame.size.height);
+			CGRect rect = CGRectMake(x, 0, width, self.bounds.size.height);
 			SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:_strokeColor];
 			star.full = !(i+1 > _countOfFull);
 			star.proportion = _proportion;
@@ -109,5 +109,33 @@
 		}
 	}
 }
+
+- (NSUInteger) numberOfStarAtPoint:(CGPoint)point
+{
+	return (( point.x / self.bounds.size.width ) * _count) + 0.5;
+}
+
+- (void) handleTouches:(NSSet *)touches
+{
+	if ( touches.count == 1 )
+	{
+		UITouch *touch = [touches anyObject];
+		CGPoint point = [touch locationInView:self];
+		
+		self.countOfFull = [self numberOfStarAtPoint:point];
+	}
+}
+
+
+
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+	[self handleTouches:touches];
+}
+- (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+	[self handleTouches:touches];
+}
+
 
 @end
