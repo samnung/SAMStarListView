@@ -85,7 +85,7 @@ void drawStar(CGContextRef context, CGRect rect, NSUInteger corners, UIColor * c
 		CGColorRef drawColor;
 		CGPathDrawingMode drawMode;
 		
-		if ( emptyColor )
+		if ( emptyColor && ! full )
 		{
 			drawColor = emptyColor.CGColor;
 			drawMode = kCGPathFillStroke;

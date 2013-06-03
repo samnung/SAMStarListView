@@ -45,48 +45,36 @@
 - (void) setSquare:(BOOL)square
 {
 	_square = square;
-	
-	for ( UIView * view in self.subviews )
-	{
-		if ( [view isMemberOfClass:[SAMStarView class]] )
-		{
-			SAMStarView *star = (SAMStarView *)view;
-			star.square = _square;
-		}
-	}
+	[self updateStars];
+}
+
+- (void) setCountOfFull:(NSUInteger)countOfFull
+{
+	_countOfFull = countOfFull;
+	[self updateStars];
 }
 
 - (void) setStrokeColor:(UIColor *)strokeColor
 {
 	_strokeColor = strokeColor;
-	
-	for ( UIView * view in self.subviews )
-	{
-		if ( [view isMemberOfClass:[SAMStarView class]] )
-		{
-			SAMStarView *star = (SAMStarView *)view;
-			star.color = _strokeColor;
-		}
-	}
+	[self updateStars];
 }
 
 - (void) setEmptyColor:(UIColor *)emptyColor
 {
 	_emptyColor = emptyColor;
-	
-	for ( UIView * view in self.subviews )
-	{
-		if ( [view isMemberOfClass:[SAMStarView class]] )
-		{
-			SAMStarView *star = (SAMStarView *)view;
-			star.emptyColor = _emptyColor;
-		}
-	}
+	[self updateStars];
 }
 
 - (void) setProportion:(CGFloat)proportion
 {
 	_proportion = proportion;
+	[self updateStars];
+}
+
+- (void) updateStars
+{
+	NSUInteger i = 0;
 	
 	for ( UIView * view in self.subviews )
 	{
@@ -94,6 +82,13 @@
 		{
 			SAMStarView *star = (SAMStarView *)view;
 			star.proportion = _proportion;
+			star.emptyColor = _emptyColor;
+			star.color = _strokeColor;
+			star.square = _square;
+			
+			star.full = !(i+1 > _countOfFull);
+			
+			i++;
 		}
 	}
 }
@@ -109,7 +104,7 @@
 	{
 		if ( [view isMemberOfClass:[SAMStarView class]] )
 		{
-			view.frame = CGRectMake(i * width, 0.0, width, height);;
+			view.frame = CGRectMake(i * width, 0.0, width, height);
 			i++;
 		}
 	}
