@@ -9,7 +9,7 @@
 
 @implementation SAMStarView
 
-@synthesize full = _full, color = _color, square = _square;
+@synthesize full = _full, color = _color, square = _square, emptyColor = _emptyColor, proportion = _proportion;
 
 
 # pragma mark Init
@@ -21,7 +21,13 @@
     if (self)
 	{
 		_color = color;
+		
 		_full = YES;
+		_square = NO;
+		
+		_proportion = 0.38;
+		
+		_emptyColor = nil;
 		
 		[self setBackgroundColor:[UIColor clearColor]];
     }
@@ -51,11 +57,23 @@
 	[self setNeedsDisplay];
 }
 
+- (void) setEmptyColor:(UIColor *)emptyColor
+{
+	_emptyColor = emptyColor;
+	[self setNeedsDisplay];
+}
+
+- (void) setProportion:(CGFloat)proportion
+{
+	_proportion = proportion;
+	[self setNeedsDisplay];
+}
+
 
 #pragma mark Draw
 
 
-void drawStar(CGContextRef context, CGRect rect, NSUInteger corners, UIColor * color,
+void drawStar(CGContextRef context, CGRect rect, NSUInteger corners, UIColor * color, UIColor * emptyColor,
 			  CGFloat proportion, CGFloat startAngle, BOOL full)
 {
 	if (corners > 2)
@@ -63,8 +81,23 @@ void drawStar(CGContextRef context, CGRect rect, NSUInteger corners, UIColor * c
 		CGFloat 	lineWidth = MIN(rect.size.height, rect.size.width) / 13;
 		
 		CGContextSetLineWidth(context, lineWidth);
-		CGContextSetStrokeColorWithColor(context, color.CGColor);
-		CGContextSetFillColorWithColor(context, color.CGColor);
+		
+		CGColorRef drawColor;
+		CGPathDrawingMode drawMode;
+		
+		if ( emptyColor )
+		{
+			drawColor = emptyColor.CGColor;
+			drawMode = kCGPathFillStroke;
+		}
+		else
+		{
+			drawColor = color.CGColor;
+			drawMode = full ? kCGPathFillStroke : kCGPathStroke;
+		}
+		
+		CGContextSetStrokeColorWithColor(context, drawColor);
+		CGContextSetFillColorWithColor(context, drawColor);
 		
 		
 		float angle = (M_PI * 2) / (2 * corners);  // twice as many sides
@@ -101,8 +134,7 @@ void drawStar(CGContextRef context, CGRect rect, NSUInteger corners, UIColor * c
 		}
 		
 		CGContextClosePath(context);
-		
-		CGContextDrawPath(context, full ? kCGPathFillStroke : kCGPathStroke);
+		CGContextDrawPath(context, drawMode);
 	}
 }
 
@@ -138,7 +170,7 @@ CGRect starRect(CGRect rect, BOOL square)
 	[super drawRect:rect];
 	
 	// draw star
-	drawStar(UIGraphicsGetCurrentContext(), starRect(rect, _square), 5, _color, 0.38, (-M_PI / 2.0), _full);
+	drawStar(UIGraphicsGetCurrentContext(), starRect(rect, _square), 5, _color, _emptyColor, _proportion, (-M_PI / 2.0), _full);
 
 }
 
