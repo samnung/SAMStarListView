@@ -18,21 +18,16 @@
 {
     self = [super initWithFrame:frame];
 	
-    if (self)
+    if ( self )
 	{
 		_color = color;
 		_full = YES;
 		_square = YES;
+		[self setBackgroundColor:[UIColor clearColor]];
     }
 	
     return self;
 }
-
-- (void) didMoveToSuperview
-{
-	[self setBackgroundColor:[UIColor clearColor]];
-}
-
 
 
 #pragma mark Setters
