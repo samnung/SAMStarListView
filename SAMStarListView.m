@@ -9,10 +9,74 @@
 #import "SAMStarView.h"
 
 
+static BOOL _defaultSquare = YES;
+static CGFloat _defaultProportion = 0.38;
+
+static NSUInteger _defaultCount = 5;
+static NSUInteger _defaultCountOfFull = 0;
+
+static UIColor * _defaultStrokeColor = nil;
+static UIColor * _defaultEmptyColor = nil;
+
+#define kDefaultStrokeColor [UIColor yellowColor]
+
+
 @implementation SAMStarListView
+
+// -------------------------------------------
+
++ (void) setDefaultSquare:(BOOL)sqaure
+{
+	_defaultSquare = sqaure;
+}
+
++ (void) setDefaultProportion:(CGFloat)proportion
+{
+	_defaultProportion = proportion;
+}
+
++ (void) setDefaultCount:(NSUInteger)count
+{
+	_defaultCount = count;
+}
++ (void) setDefaultCountOfFull:(NSUInteger)countOfFull
+{
+	_defaultCountOfFull = countOfFull;
+}
+
++ (void) setDefaultStrokeColor:(UIColor *)color
+{
+	if ( color )
+		_defaultStrokeColor = color;
+	else
+		_defaultStrokeColor = kDefaultStrokeColor;
+}
++ (void) setDefaultEmptyColor:(UIColor *)color
+{
+	_defaultEmptyColor = color;
+}
+
+
+
+
+// ---------------------------------------------
 
 @synthesize count = _count, countOfFull = _countOfFull, square = _square, strokeColor = _strokeColor, emptyColor = _emptyColor, proportion = _proportion;
 
+
+- (void) myInit
+{
+	_emptyColor = _defaultEmptyColor;
+	_proportion = _defaultProportion;
+	_square = _defaultSquare;
+
+	_count = _defaultCount;
+	_countOfFull = _defaultCountOfFull;
+	
+	if ( ! _defaultStrokeColor ) _defaultStrokeColor = kDefaultStrokeColor;
+	
+	_strokeColor = _defaultStrokeColor;
+}
 
 - (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor
 {
@@ -20,23 +84,39 @@
 	
 	if ( self )
 	{
+		[self myInit];
+		
 		_count = count;
 		_countOfFull = countOfFull;
 		_strokeColor = strokeColor;
-		_emptyColor = nil;
-		_proportion = 0.38;
 		
-		for (NSUInteger i = 0; i < _count; i ++)
-		{
-			CGFloat width = self.bounds.size.width / _count;
-			CGFloat x = i * width;
-			CGRect rect = CGRectMake(x, 0, width, self.bounds.size.height);
-			SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:_strokeColor];
-			star.full = !(i+1 > _countOfFull);
-			star.proportion = _proportion;
-			star.emptyColor = _emptyColor;
-			[self addSubview:star];
-		}
+		[self updateStars];
+	}
+	
+	return self;
+}
+
+- (id) initWithFrame:(CGRect)frame
+{
+	self = [super initWithFrame:frame];
+	
+	if ( self )
+	{
+		[self myInit];
+		[self updateStars];
+	}
+	
+	return self;
+}
+
+- (id) initWithCoder:(NSCoder *)aDecoder
+{
+	self = [super initWithCoder:aDecoder];
+	
+	if ( self )
+	{
+		[self myInit];
+		[self updateStars];
 	}
 	
 	return self;
@@ -45,34 +125,62 @@
 - (void) setSquare:(BOOL)square
 {
 	_square = square;
-	[self updateStars];
+	[self updateStarsProperties];
 }
 
 - (void) setCountOfFull:(NSUInteger)countOfFull
 {
 	_countOfFull = countOfFull;
-	[self updateStars];
+	[self updateStarsProperties];
 }
 
 - (void) setStrokeColor:(UIColor *)strokeColor
 {
-	_strokeColor = strokeColor;
-	[self updateStars];
+	if ( strokeColor )
+		_strokeColor = strokeColor;
+	else
+		_strokeColor = kDefaultStrokeColor;
+	
+	[self updateStarsProperties];
 }
 
 - (void) setEmptyColor:(UIColor *)emptyColor
 {
 	_emptyColor = emptyColor;
-	[self updateStars];
+	[self updateStarsProperties];
 }
 
 - (void) setProportion:(CGFloat)proportion
 {
 	_proportion = proportion;
+	[self updateStarsProperties];
+}
+
+- (void) setCount:(NSUInteger)count
+{
+	_count = count;
+	
 	[self updateStars];
 }
 
+
 - (void) updateStars
+{
+	[self removeAllSubviews];
+	
+	for (NSUInteger i = 0; i < _count; i++ )
+	{
+		CGFloat width = self.bounds.size.width / _count;
+		CGFloat x = i * width;
+		CGRect rect = CGRectMake(x, 0, width, self.bounds.size.height);
+		SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:_strokeColor];
+		[self addSubview:star];
+	}
+	
+	[self updateStarsProperties];
+}
+
+- (void) updateStarsProperties
 {
 	NSUInteger i = 0;
 	

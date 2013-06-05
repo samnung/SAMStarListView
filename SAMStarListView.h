@@ -9,10 +9,10 @@
 @interface SAMStarListView : UIView
 
 
-@property (nonatomic, assign) NSUInteger count;
-@property (nonatomic, assign) NSUInteger countOfFull;
+@property (nonatomic, assign) NSUInteger count; // default 5
+@property (nonatomic, assign) NSUInteger countOfFull; // default 0
 
-@property (nonatomic, assign) BOOL square;
+@property (nonatomic, assign) BOOL square; // default YES
 
 @property (nonatomic, strong) UIColor * strokeColor;
 @property (nonatomic, strong) UIColor * emptyColor;
@@ -21,6 +21,18 @@
 
 
 - (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor;
+
+
+
++ (void) setDefaultSquare:(BOOL)sqaure;
+
++ (void) setDefaultProportion:(CGFloat)proportion;
+
++ (void) setDefaultCount:(NSUInteger)count;
++ (void) setDefaultCountOfFull:(NSUInteger)countOfFull;
+
++ (void) setDefaultStrokeColor:(UIColor *)color;
++ (void) setDefaultEmptyColor:(UIColor *)color;
 
 
 @end

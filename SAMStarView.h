@@ -11,12 +11,12 @@
 
 
 @property (nonatomic, assign) BOOL full; // default YES
-@property (nonatomic, assign) BOOL square; // default NO
+@property (nonatomic, assign) BOOL square; // default YES
 
 @property (nonatomic, strong) UIColor * color;
-@property (nonatomic, strong) UIColor * emptyColor; // default nil
+@property (nonatomic, strong) UIColor * emptyColor;
 
-@property (nonatomic, assign) CGFloat proportion; // default 0.38
+@property (nonatomic, assign) CGFloat proportion; // recomended is 0.38
 
 
 - (id) initWithFrame:(CGRect)frame color:(UIColor *)color;

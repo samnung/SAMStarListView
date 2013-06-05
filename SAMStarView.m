@@ -21,18 +21,16 @@
     if (self)
 	{
 		_color = color;
-		
 		_full = YES;
-		_square = NO;
-		
-		_proportion = 0.38;
-		
-		_emptyColor = nil;
-		
-		[self setBackgroundColor:[UIColor clearColor]];
+		_square = YES;
     }
 	
     return self;
+}
+
+- (void) didMoveToSuperview
+{
+	[self setBackgroundColor:[UIColor clearColor]];
 }
 
 
