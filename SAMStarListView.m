@@ -112,7 +112,7 @@
 
 - (NSUInteger) numberOfStarAtPoint:(CGPoint)point
 {
-	return (( point.x / self.bounds.size.width ) * _count) + 0.5;
+	return (( point.x / self.bounds.size.width ) * _count) + 0.75;
 }
 
 - (void) handleTouches:(NSSet *)touches
