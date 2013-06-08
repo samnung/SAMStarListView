@@ -5,7 +5,7 @@
 //  Copyright (c) 2013 samnung. All rights reserved.
 //
 
-#include <UIKit/UIKit.h>
+#import <UIKit/UIKit.h>
 
 @interface SAMStarListView : UIView
 
