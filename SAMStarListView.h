@@ -10,7 +10,7 @@
 
 
 @property (nonatomic, assign) NSUInteger count; // default 5
-@property (nonatomic, assign) NSUInteger countOfFull; // default 0
+@property (nonatomic, assign) NSUInteger countOfSelected; // default 0
 
 @property (nonatomic, assign) BOOL square; // default YES
 
@@ -20,7 +20,7 @@
 @property (nonatomic, assign) CGFloat proportion; // default 0.38
 
 
-- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor;
+- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfSelected:(NSUInteger)countOfSelected withStrokeColor:(UIColor *)strokeColor;
 
 
 
@@ -29,7 +29,7 @@
 + (void) setDefaultProportion:(CGFloat)proportion;
 
 + (void) setDefaultCount:(NSUInteger)count;
-+ (void) setDefaultCountOfFull:(NSUInteger)countOfFull;
++ (void) setDefaultCountOfSelected:(NSUInteger)countOfSelected;
 
 + (void) setDefaultStrokeColor:(UIColor *)color;
 + (void) setDefaultEmptyColor:(UIColor *)color;

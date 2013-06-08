@@ -12,7 +12,7 @@ static BOOL _defaultSquare = YES;
 static CGFloat _defaultProportion = 0.38;
 
 static NSUInteger _defaultCount = 5;
-static NSUInteger _defaultCountOfFull = 0;
+static NSUInteger _defaultCountOfSelected = 0;
 
 static UIColor * _defaultStrokeColor = nil;
 static UIColor * _defaultEmptyColor = nil;
@@ -38,9 +38,9 @@ static UIColor * _defaultEmptyColor = nil;
 {
 	_defaultCount = count;
 }
-+ (void) setDefaultCountOfFull:(NSUInteger)countOfFull
++ (void) setDefaultCountOfSelected:(NSUInteger)countOfSelected
 {
-	_defaultCountOfFull = countOfFull;
+	_defaultCountOfSelected = countOfSelected;
 }
 
 + (void) setDefaultStrokeColor:(UIColor *)color
@@ -60,7 +60,7 @@ static UIColor * _defaultEmptyColor = nil;
 
 // ---------------------------------------------
 
-@synthesize count = _count, countOfFull = _countOfFull, square = _square, strokeColor = _strokeColor, emptyColor = _emptyColor, proportion = _proportion;
+@synthesize count = _count, countOfSelected = _countOfSelected, square = _square, strokeColor = _strokeColor, emptyColor = _emptyColor, proportion = _proportion;
 
 
 - (void) myInit
@@ -70,14 +70,14 @@ static UIColor * _defaultEmptyColor = nil;
 	_square = _defaultSquare;
 
 	_count = _defaultCount;
-	_countOfFull = _defaultCountOfFull;
+	_countOfSelected = _defaultCountOfSelected;
 
 	if ( ! _defaultStrokeColor ) _defaultStrokeColor = kDefaultStrokeColor;
 
 	_strokeColor = _defaultStrokeColor;
 }
 
-- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor
+- (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfSelected:(NSUInteger)countOfSelected withStrokeColor:(UIColor *)strokeColor
 {
 	self = [super initWithFrame:frame];
 
@@ -86,7 +86,7 @@ static UIColor * _defaultEmptyColor = nil;
 		[self myInit];
 
 		_count = count;
-		_countOfFull = countOfFull;
+		_countOfSelected = countOfSelected;
 		_strokeColor = strokeColor;
 	}
 
@@ -131,9 +131,9 @@ static UIColor * _defaultEmptyColor = nil;
 	_count = count;
 	[self setNeedsDisplay];
 }
-- (void) setCountOfFull:(NSUInteger)countOfFull
+- (void) setCountOfSelected:(NSUInteger)countOfSelected
 {
-	_countOfFull = countOfFull;
+	_countOfSelected = countOfSelected;
 	[self setNeedsDisplay];
 }
 - (void) setStrokeColor:(UIColor *)strokeColor
@@ -173,7 +173,7 @@ static UIColor * _defaultEmptyColor = nil;
 		UITouch *touch = [touches anyObject];
 		CGPoint point = [touch locationInView:self];
 
-		self.countOfFull = [self numberOfStarAtPoint:point];
+		self.countOfSelected = [self numberOfStarAtPoint:point];
 	}
 }
 
@@ -296,7 +296,7 @@ CGRect starRect(CGRect rect, BOOL square)
 		CGRect starRect_ = CGRectMake(x, 0, width, self.bounds.size.height);
 
 
-		BOOL full = !(i+1 > _countOfFull);
+		BOOL full = !(i+1 > _countOfSelected);
 
 		// draw star
 		drawStar(UIGraphicsGetCurrentContext(), starRect(starRect_, _square), 5, _strokeColor, _emptyColor, _proportion, (-M_PI / 2.0), full);
