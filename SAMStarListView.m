@@ -6,7 +6,6 @@
 //
 
 #import "SAMStarListView.h"
-#import "SAMStarView.h"
 
 
 static BOOL _defaultSquare = YES;
@@ -72,155 +71,99 @@ static UIColor * _defaultEmptyColor = nil;
 
 	_count = _defaultCount;
 	_countOfFull = _defaultCountOfFull;
-	
+
 	if ( ! _defaultStrokeColor ) _defaultStrokeColor = kDefaultStrokeColor;
-	
+
 	_strokeColor = _defaultStrokeColor;
 }
 
 - (id) initWithFrame:(CGRect)frame count:(NSUInteger)count countOfFull:(NSUInteger)countOfFull withStrokeColor:(UIColor *)strokeColor
 {
 	self = [super initWithFrame:frame];
-	
+
 	if ( self )
 	{
 		[self myInit];
-		
+
 		_count = count;
 		_countOfFull = countOfFull;
 		_strokeColor = strokeColor;
-		
-		[self updateStars];
 	}
-	
+
 	return self;
 }
 
 - (id) initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
-	
+
 	if ( self )
 	{
 		[self myInit];
-		[self updateStars];
 	}
-	
+
 	return self;
 }
 
 - (id) initWithCoder:(NSCoder *)aDecoder
 {
 	self = [super initWithCoder:aDecoder];
-	
+
 	if ( self )
 	{
 		[self myInit];
-		[self updateStars];
 	}
-	
+
 	return self;
 }
+
+
+#pragma mark -
+#pragma mark Getters / Setters
 
 - (void) setSquare:(BOOL)square
 {
 	_square = square;
-	[self updateStarsProperties];
+	[self setNeedsDisplay];
 }
-
+- (void) setCount:(NSUInteger)count
+{
+	_count = count;
+	[self setNeedsDisplay];
+}
 - (void) setCountOfFull:(NSUInteger)countOfFull
 {
 	_countOfFull = countOfFull;
-	[self updateStarsProperties];
+	[self setNeedsDisplay];
 }
-
 - (void) setStrokeColor:(UIColor *)strokeColor
 {
 	if ( strokeColor )
 		_strokeColor = strokeColor;
 	else
 		_strokeColor = kDefaultStrokeColor;
-	
-	[self updateStarsProperties];
-}
 
+	[self setNeedsDisplay];
+}
 - (void) setEmptyColor:(UIColor *)emptyColor
 {
 	_emptyColor = emptyColor;
-	[self updateStarsProperties];
+	[self setNeedsDisplay];
 }
-
 - (void) setProportion:(CGFloat)proportion
 {
 	_proportion = proportion;
-	[self updateStarsProperties];
-}
-
-- (void) setCount:(NSUInteger)count
-{
-	_count = count;
-	
-	[self updateStars];
+	[self setNeedsDisplay];
 }
 
 
-- (void) updateStars
-{
-	[self removeAllSubviews];
-	
-	for (NSUInteger i = 0; i < _count; i++ )
-	{
-		CGFloat width = self.bounds.size.width / _count;
-		CGFloat x = i * width;
-		CGRect rect = CGRectMake(x, 0, width, self.bounds.size.height);
-		SAMStarView *star = [[SAMStarView alloc] initWithFrame:rect color:_strokeColor];
-		[self addSubview:star];
-	}
-	
-	[self updateStarsProperties];
-}
 
-- (void) updateStarsProperties
-{
-	NSUInteger i = 0;
-	
-	for ( UIView * view in self.subviews )
-	{
-		if ( [view isMemberOfClass:[SAMStarView class]] )
-		{
-			SAMStarView *star = (SAMStarView *)view;
-			star.proportion = _proportion;
-			star.emptyColor = _emptyColor;
-			star.color = _strokeColor;
-			star.square = _square;
-			
-			star.full = !(i+1 > _countOfFull);
-			
-			i++;
-		}
-	}
-}
-
-- (void) layoutSubviews
-{
-	NSUInteger i = 0;
-	
-	CGFloat width = self.frame.size.width / _count;
-	CGFloat height = self.frame.size.height;
-	
-	for ( UIView * view in self.subviews )
-	{
-		if ( [view isMemberOfClass:[SAMStarView class]] )
-		{
-			view.frame = CGRectMake(i * width, 0.0, width, height);
-			i++;
-		}
-	}
-}
+#pragma mark -
+#pragma mark Touch
 
 - (NSUInteger) numberOfStarAtPoint:(CGPoint)point
 {
-	return (( point.x / self.bounds.size.width ) * _count) + 0.75;
+	return (( point.x / self.bounds.size.width ) * _count) + 0.75; // 0.75 == 1 - 0.25 treshold
 }
 
 - (void) handleTouches:(NSSet *)touches
@@ -229,12 +172,10 @@ static UIColor * _defaultEmptyColor = nil;
 	{
 		UITouch *touch = [touches anyObject];
 		CGPoint point = [touch locationInView:self];
-		
+
 		self.countOfFull = [self numberOfStarAtPoint:point];
 	}
 }
-
-
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -243,6 +184,123 @@ static UIColor * _defaultEmptyColor = nil;
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
 	[self handleTouches:touches];
+}
+
+
+
+
+
+
+#pragma mark -
+#pragma mark Draw
+
+// algorythm http://processing.org/tutorials/anatomy/
+void drawStar(CGContextRef context, CGRect rect, NSUInteger corners, UIColor * color, UIColor * emptyColor,
+			  CGFloat proportion, CGFloat startAngle, BOOL full)
+{
+	if (corners > 2)
+	{
+		CGFloat 	lineWidth = MIN(rect.size.height, rect.size.width) / 13;
+
+		CGContextSetLineWidth(context, lineWidth);
+
+		CGColorRef drawColor;
+		CGPathDrawingMode drawMode;
+
+		if ( emptyColor && ! full )
+		{
+			drawColor = emptyColor.CGColor;
+			drawMode = kCGPathFillStroke;
+		}
+		else
+		{
+			drawColor = color.CGColor;
+			drawMode = full ? kCGPathFillStroke : kCGPathStroke;
+		}
+
+		CGContextSetStrokeColorWithColor(context, drawColor);
+		CGContextSetFillColorWithColor(context, drawColor);
+
+
+		float angle = (M_PI * 2) / (2 * corners);  // twice as many sides
+		float dw; // draw width
+		float dh; // draw height
+
+
+		CGFloat width = rect.size.width - 2.5 * lineWidth;
+		CGFloat height = rect.size.height - 2.3 * lineWidth;
+		CGFloat w = width / 2.0;
+		CGFloat h = height / 2.0;
+
+		CGFloat cx = CGRectGetMidX(rect);
+		CGFloat cy = CGRectGetMidY(rect) + lineWidth / 2;
+
+
+		CGContextMoveToPoint(context, cx + w * cos(startAngle), cy + h * sin(startAngle));
+
+		for (int i = 1; i < 2 * corners; i++)
+		{
+			if (i % 2 == 1)
+			{
+				dw = w * proportion;
+				dh = h * proportion;
+			}
+			else
+			{
+				dw = w;
+				dh = h;
+			}
+
+			CGContextAddLineToPoint(context, cx + dw * cos(startAngle + angle * i),
+									cy + dh * sin(startAngle + angle * i));
+		}
+
+		CGContextClosePath(context);
+		CGContextDrawPath(context, drawMode);
+	}
+}
+
+CGRect starRect(CGRect rect, BOOL square)
+{
+	CGFloat width = rect.size.width;
+	CGFloat height = rect.size.height;
+	CGFloat x = rect.origin.x;
+	CGFloat y = rect.origin.y;
+
+	if ( square )
+	{
+		if ( height < width )
+		{
+			x += width / 2 - height / 2;
+		}
+		else
+		{
+			y += width / 2 - height / 2;
+		}
+
+		CGFloat min = MIN(height, width);
+
+		width = min;
+		height = min;
+	}
+
+	return CGRectMake(x, y, width, height);
+}
+
+- (void) drawRect:(CGRect)rect
+{
+	for (NSUInteger i = 0; i < _count; i++ )
+	{
+		CGFloat width = self.bounds.size.width / _count;
+		CGFloat x = i * width;
+		CGRect starRect_ = CGRectMake(x, 0, width, self.bounds.size.height);
+
+
+		BOOL full = !(i+1 > _countOfFull);
+
+		// draw star
+		drawStar(UIGraphicsGetCurrentContext(), starRect(starRect_, _square), 5, _strokeColor, _emptyColor, _proportion, (-M_PI / 2.0), full);
+	}
 }
 
 
